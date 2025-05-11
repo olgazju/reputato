@@ -1,4 +1,5 @@
 from pydantic_ai import Agent
+from pydantic_ai.settings import ModelSettings
 import unicodedata
 import re
 from app.models import (
@@ -12,7 +13,10 @@ import json
 from typing import Optional
 import logging
 
+
 logger = logging.getLogger(__name__)
+
+SUMMARIZATION_TIMEOUT = 300  # 5 minutes for summarization
 
 summarizer_agent = Agent(
     model="openai:gpt-4o",
@@ -28,6 +32,7 @@ summarizer_agent = Agent(
         "After the summary, assign a Reputato Score (1 to 5), where 5 is excellent and 1 means 'run away'."
         "If some data sources are missing, focus on what you know and be clear about what information is unavailable."
     ),
+    model_settings=ModelSettings(request_timeout=SUMMARIZATION_TIMEOUT),
 )
 
 
