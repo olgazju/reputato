@@ -62,6 +62,7 @@ async def summarize_company(company_name: str, linkedin: LinkedInProfile, glassd
         "- Mention key people (especially founders, CTOs, or execs) if available.\n"
         "- Include all major news from 2023-2025 — achievements, layoffs, or scandals — as part of the summary.\n"
         "- Use casual, clear language — like you are chatting with a friend.\n"
+        "- You can be witty, but keep it subtle. Avoid cute metaphors or quirky jokes.\n"
         "- Be honest if something feels vague, sketchy, or impressive — but stay polite.\n"
         "- Don't make things up. If something is unclear or missing, say so.\n"
         "- Avoid fluff and corporate speak.\n"

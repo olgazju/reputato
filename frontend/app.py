@@ -11,6 +11,7 @@ BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 st.set_page_config(page_title="Reputato", page_icon="🥔")
 st.title("🥔 Reputato")
 st.subheader("Is this company worth your time? Let us check.")
+st.caption("🕵️ We analyze data from public sources like LinkedIn, Glassdoor, Crunchbase and news articles from the past two years (2023-2025).")
 
 # --- Input section (always on top) ---
 company_name = st.text_input("Company name", placeholder="e.g. Google")
