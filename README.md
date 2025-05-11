@@ -9,9 +9,13 @@ Reputato is an OSINT (Open Source Intelligence) agent designed to help job seeke
 ## Features
 
 - **Multi-Source Data Collection**: Gathers information from LinkedIn, Glassdoor, Crunchbase, and news sources
-- **Real-time Analysis**: Uses Bright Data's infrastructure to access and process current information
+- **Real-time Analysis**: Uses Bright Data's MCP server to retrieve and process scraping data from various sources
 - **Comprehensive Insights**: Provides a holistic view of companies through various data points
 - **User-Friendly Interface**: Easy-to-use web interface for accessing company information
+
+## Technology Stack
+
+The backend is built as a FastAPI service that leverages PydanticAI for intelligent agent orchestration. PydanticAI provides a robust framework for building production-grade AI applications with structured data validation and type safety. The system uses OpenAI's models for natural language processing and data analysis. You can configure the model in the environment variables, but by default, it uses GPT-4 for optimal performance.
 
 ## Prerequisites
 
