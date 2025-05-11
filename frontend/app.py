@@ -38,6 +38,7 @@ if submit and company_name.strip():
                     st.success("Done!")
                     st.markdown("### Company Summary")
                     st.write(summary)
+                    st.markdown("### Reputato Score")
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown(
                         f"<div style='font-size: 1.8rem;'>{rating_str}</div>",
