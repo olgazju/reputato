@@ -1,13 +1,16 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
+
 
 class CompanySummaryWithRating(BaseModel):
     summary: str
     rating: int  # 1 to 5
 
+
 class CompanyResponse(BaseModel):
     summary: str
     rating: int
+
 
 class LinkedInProfile(BaseModel):
     company_name: str
@@ -19,11 +22,13 @@ class LinkedInProfile(BaseModel):
     industry: Optional[str]
     website: Optional[str]
 
+
 class GlassdoorProfile(BaseModel):
     rating: Optional[float]
     num_reviews: Optional[int]
     review_summary: Optional[str]
-    
+
+
 class CrunchbaseProfile(BaseModel):
     founded: Optional[str]
     funding_round: Optional[str]
@@ -31,6 +36,7 @@ class CrunchbaseProfile(BaseModel):
     funding_amount: Optional[str]
     investors: Optional[list[str]]
     key_people: Optional[list[str]]
+
 
 class NewsProfile(BaseModel):
     layoffs: list[str]

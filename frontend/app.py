@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import os
 from dotenv import load_dotenv
-import re
 
 load_dotenv()
 
@@ -11,7 +10,9 @@ BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 st.set_page_config(page_title="Reputato", page_icon="🥔")
 st.title("🥔 Reputato")
 st.subheader("Is this company worth your time? Let us check.")
-st.caption("🕵️ We analyze data from public sources like LinkedIn, Glassdoor, Crunchbase and news articles from the past two years (2023-2025).")
+st.caption(
+    "🕵️ We analyze data from public sources like LinkedIn, Glassdoor, Crunchbase and news articles from the past two years (2023-2025)."
+)
 
 # --- Input section (always on top) ---
 company_name = st.text_input("Company name", placeholder="e.g. Google")
@@ -44,7 +45,7 @@ if submit and company_name.strip():
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown(
                         f"<div style='font-size: 1.8rem;'>{rating_str}</div>",
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
             else:
                 result_container.error("Something went wrong.")

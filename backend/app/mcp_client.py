@@ -1,5 +1,4 @@
 import os
-import json
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 from pydantic_ai.settings import ModelSettings
@@ -52,22 +51,22 @@ news_server = MCPServerStdio(
 )
 
 system_prompt = (
-        "You are a tool-using agent connected to Bright Data's MCP server. "
-        "You act as an OSINT investigator whose job is to evaluate companies based on public information. "
-        "Your goal is to help users understand whether a company is reputable or potentially suspicious. "
-        "You always use Bright Data real-time tools to search, navigate, and extract data from company profiles. "
-        "You never guess or assume anything. "
-        "Company name matching must be case-sensitive and exact. Do not return data for similarly named or uppercase-variant companies."
-        "Only use the following tools during your investigation:\n"
-        "- `search_engine`\n"
-        "- `scrape_as_markdown`\n"
-        "- `scrape_as_html`\n"
-        "- `scraping_browser_navigate`\n"
-        "- `scraping_browser_get_text`\n"
-        "- `scraping_browser_click`\n"
-        "- `scraping_browser_links`\n"
-        "Do not invoke any other tools even if they are available."
-    )
+    "You are a tool-using agent connected to Bright Data's MCP server. "
+    "You act as an OSINT investigator whose job is to evaluate companies based on public information. "
+    "Your goal is to help users understand whether a company is reputable or potentially suspicious. "
+    "You always use Bright Data real-time tools to search, navigate, and extract data from company profiles. "
+    "You never guess or assume anything. "
+    "Company name matching must be case-sensitive and exact. Do not return data for similarly named or uppercase-variant companies."
+    "Only use the following tools during your investigation:\n"
+    "- `search_engine`\n"
+    "- `scrape_as_markdown`\n"
+    "- `scrape_as_html`\n"
+    "- `scraping_browser_navigate`\n"
+    "- `scraping_browser_get_text`\n"
+    "- `scraping_browser_click`\n"
+    "- `scraping_browser_links`\n"
+    "Do not invoke any other tools even if they are available."
+)
 
 model = "openai:gpt-4.1-mini"
 
@@ -77,10 +76,9 @@ linkedin_agent = Agent(
     mcp_servers=[linkedin_server],
     retries=1,
     system_prompt=system_prompt,
-    model_settings=ModelSettings(
-        request_timeout=120  # timeout in seconds
-    )
+    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
 )
+
 
 async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
     prompt = (
@@ -100,14 +98,14 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
         "3. `scraping_browser_links` and `scraping_browser_click` — to navigate if needed\n\n"
         "Return ONLY a JSON object with the following keys:\n"
         "{\n"
-        "  \"company_name\": str,\n"
-        "  \"description\": str,\n"
-        "  \"number_of_employees\": str,\n"
-        "  \"linkedin_url\": str,\n"
-        "  \"headquarters\": str,\n"
-        "  \"founded\": str or null,\n"
-        "  \"industry\": str,\n"
-        "  \"website\": str,\n"
+        '  "company_name": str,\n'
+        '  "description": str,\n'
+        '  "number_of_employees": str,\n'
+        '  "linkedin_url": str,\n'
+        '  "headquarters": str,\n'
+        '  "founded": str or null,\n'
+        '  "industry": str,\n'
+        '  "website": str,\n'
         "}\n\n"
         "Do not include raw HTML, markdown, explanations, or other fields. "
         "If a field is missing, use null for that field. If the company cannot be found at all, return null."
@@ -121,17 +119,16 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
         print(f"Linkedin error {e}")
         return None
 
+
 glassdoor_agent = Agent(
     model,
     output_type=GlassdoorProfile,
     mcp_servers=[glassdoor_server],
     retries=1,
     system_prompt=system_prompt,
-    model_settings=ModelSettings(
-        request_timeout=120  # timeout in seconds
-    )
-
+    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
 )
+
 
 async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
     prompt = (
@@ -146,9 +143,9 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
         "3. `scraping_browser_links` and `scraping_browser_click` — to find and open the review section if necessary\n\n"
         "Return ONLY a JSON object with the following keys:\n"
         "{\n"
-        "  \"rating\": float,\n"
-        "  \"num_reviews\": int,\n"
-        "  \"review_summary\": str\n"
+        '  "rating": float,\n'
+        '  "num_reviews": int,\n'
+        '  "review_summary": str\n'
         "}\n\n"
         "Only use reviews from 2025 or 2024. Do not include older reviews.\n"
         "Do not include HTML, markdown, or explanations"
@@ -161,17 +158,17 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
     except ModelHTTPError as e:
         print(f"[Glassdoor error {e}")
         return None
-    
+
+
 crunchbase_agent = Agent(
     model,
     output_type=CrunchbaseProfile,
     mcp_servers=[crunchbase_server],
     retries=1,
     system_prompt=system_prompt,
-    model_settings=ModelSettings(
-        request_timeout=120  # timeout in seconds
-    )
+    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
 )
+
 
 async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile]:
     prompt = (
@@ -189,12 +186,12 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
         "3. `scraping_browser_links` and `scraping_browser_click`\n\n"
         "Return ONLY a JSON object with the following keys:\n"
         "{\n"
-        "  \"founded\": str or null,\n"
-        "  \"funding_round\": str or null,\n"
-        "  \"funding_date\": str or null,\n"
-        "  \"funding_amount\": str or null,\n"
-        "  \"investors\": list[str] or null,\n"
-        "  \"key_people\": list[str] or null\n"
+        '  "founded": str or null,\n'
+        '  "funding_round": str or null,\n'
+        '  "funding_date": str or null,\n'
+        '  "funding_amount": str or null,\n'
+        '  "investors": list[str] or null,\n'
+        '  "key_people": list[str] or null\n'
         "}\n\n"
         "Do not include HTML, markdown, or explanations"
         "If a field is missing, use null for that field. If the company cannot be found at all, return null."
@@ -206,7 +203,7 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
     except ModelHTTPError as e:
         print(f"Crunchbase error {e}")
         return None
-    
+
 
 news_agent = Agent(
     "openai:gpt-4o-mini",
@@ -220,8 +217,9 @@ news_agent = Agent(
         "Only include verifiable news events. Do not hallucinate or assume. "
         "Use search tools and extract only clearly dated, relevant headlines. "
         "Return up to 3 short bullet summaries per category."
-    )
+    ),
 )
+
 
 async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
     prompt = (

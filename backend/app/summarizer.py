@@ -1,23 +1,30 @@
 from pydantic_ai import Agent
 import unicodedata
 import re
-from app.models import LinkedInProfile, CompanySummaryWithRating, GlassdoorProfile, CrunchbaseProfile, NewsProfile
+from app.models import (
+    LinkedInProfile,
+    CompanySummaryWithRating,
+    GlassdoorProfile,
+    CrunchbaseProfile,
+    NewsProfile,
+)
 import json
 
 summarizer_agent = Agent(
     model="openai:gpt-4o",
     output_type=CompanySummaryWithRating,
-    system_prompt = (
-    "You are an OSINT analyst who writes honest and useful summaries of companies for job seekers. "
-    "Imagine a friend asked you: 'Should I even consider applying here?' "
-    "You write in natural, informal language — short, direct, and with a dry sense of humor. "
-    "Your job is to quickly describe what the company does, how big it is, how stable it seems, and what kind of experience to expect. "
-    "You are re allowed to be skeptical if something feels off — say so. "
-    "Avoid corporate jargon, fake positivity, or vague statements. "
-    "Write 15-20 short sentences max. Be critical when needed. This is for people who value honest, no-bullshit career advice."
-    "After the summary, assign a Reputato Score (1 to 5), where 5 is excellent and 1 means 'run away'."
+    system_prompt=(
+        "You are an OSINT analyst who writes honest and useful summaries of companies for job seekers. "
+        "Imagine a friend asked you: 'Should I even consider applying here?' "
+        "You write in natural, informal language — short, direct, and with a dry sense of humor. "
+        "Your job is to quickly describe what the company does, how big it is, how stable it seems, and what kind of experience to expect. "
+        "You are re allowed to be skeptical if something feels off — say so. "
+        "Avoid corporate jargon, fake positivity, or vague statements. "
+        "Write 15-20 short sentences max. Be critical when needed. This is for people who value honest, no-bullshit career advice."
+        "After the summary, assign a Reputato Score (1 to 5), where 5 is excellent and 1 means 'run away'."
+    ),
 )
-)
+
 
 def clean_summary(text: str) -> str:
     # Normalize Unicode characters (smart quotes, etc.)
@@ -41,7 +48,14 @@ def clean_summary(text: str) -> str:
     cleaned = re.sub(r"\s+", " ", cleaned)
     return cleaned.strip()
 
-async def summarize_company(company_name: str, linkedin: LinkedInProfile, glassdoor: GlassdoorProfile, crunchbase: CrunchbaseProfile, news: NewsProfile) -> CompanySummaryWithRating:
+
+async def summarize_company(
+    company_name: str,
+    linkedin: LinkedInProfile,
+    glassdoor: GlassdoorProfile,
+    crunchbase: CrunchbaseProfile,
+    news: NewsProfile,
+) -> CompanySummaryWithRating:
 
     linkedin_json = json.dumps(linkedin.model_dump(), indent=2)
     glassdoor_json = json.dumps(glassdoor.model_dump(), indent=2)
