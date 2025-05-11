@@ -1,4 +1,5 @@
 import os
+import asyncio
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 from pydantic_ai.settings import ModelSettings
@@ -14,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
+
+REQUEST_TIMEOUT = 240
 
 
 def log_execution_time(func):
@@ -130,7 +133,9 @@ try:
         mcp_servers=[linkedin_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+        model_settings=ModelSettings(
+            request_timeout=REQUEST_TIMEOUT
+        ),  # timeout in seconds
     )
 
     glassdoor_agent = Agent(
@@ -139,7 +144,9 @@ try:
         mcp_servers=[glassdoor_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+        model_settings=ModelSettings(
+            request_timeout=REQUEST_TIMEOUT
+        ),  # timeout in seconds
     )
 
     crunchbase_agent = Agent(
@@ -148,7 +155,9 @@ try:
         mcp_servers=[crunchbase_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+        model_settings=ModelSettings(
+            request_timeout=REQUEST_TIMEOUT
+        ),  # timeout in seconds
     )
 
     news_agent = Agent(
@@ -164,7 +173,9 @@ try:
             "Use search tools and extract only clearly dated, relevant headlines. "
             "Return up to 3 short bullet summaries per category."
         ),
-        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+        model_settings=ModelSettings(
+            request_timeout=REQUEST_TIMEOUT
+        ),  # timeout in seconds
     )
     logger.info("Successfully initialized all agents")
 except Exception:
@@ -207,7 +218,9 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
 
     try:
         async with linkedin_agent.run_mcp_servers():
-            result = await linkedin_agent.run(prompt)
+            result = await asyncio.wait_for(
+                linkedin_agent.run(prompt), timeout=REQUEST_TIMEOUT
+            )
             logger.info(f"Successfully fetched LinkedIn data for {company_name}")
             return result.output
     except ModelHTTPError as e:
@@ -246,7 +259,9 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
     )
     try:
         async with glassdoor_agent.run_mcp_servers():
-            result = await glassdoor_agent.run(prompt)
+            result = await asyncio.wait_for(
+                glassdoor_agent.run(prompt), timeout=REQUEST_TIMEOUT
+            )
             logger.info(f"Successfully fetched Glassdoor data for {company_name}")
             return result.output
     except ModelHTTPError as e:
@@ -290,7 +305,9 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
     )
     try:
         async with crunchbase_agent.run_mcp_servers():
-            result = await crunchbase_agent.run(prompt)
+            result = await asyncio.wait_for(
+                crunchbase_agent.run(prompt), timeout=REQUEST_TIMEOUT
+            )
             logger.info(f"Successfully fetched Crunchbase data for {company_name}")
             return result.output
     except ModelHTTPError as e:
@@ -325,7 +342,9 @@ async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
     )
     try:
         async with news_agent.run_mcp_servers():
-            result = await news_agent.run(prompt)
+            result = await asyncio.wait_for(
+                news_agent.run(prompt), timeout=REQUEST_TIMEOUT
+            )
             logger.info(f"Successfully fetched news data for {company_name}")
             return result.output
     except ModelHTTPError as e:

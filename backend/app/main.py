@@ -21,6 +21,10 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+# Constants for timeouts
+DATA_FETCH_TIMEOUT = 300  # 5 minutes for data fetching
+SUMMARIZATION_TIMEOUT = 300  # 5 minutes for summarization
+
 
 @app.get("/analyze_company", response_model=CompanyResponse)
 async def analyze_company(name: str = Query(..., description="Company name")):
@@ -41,8 +45,9 @@ async def analyze_company(name: str = Query(..., description="Company name")):
                     news_task,
                     return_exceptions=True,
                 ),
-                timeout=300,
+                timeout=DATA_FETCH_TIMEOUT,
             )
+            logger.info("All data fetching tasks completed")
         except asyncio.TimeoutError:
             logger.error(f"Timeout while fetching data for company: {name}")
             # If timeout occurs, cancel all tasks
@@ -73,17 +78,25 @@ async def analyze_company(name: str = Query(..., description="Company name")):
                 rating=1,
             )
 
-        logger.info(f"Generating summary for {name} with available data sources")
-        summary_result = await summarize_company(
-            name, linkedin, glassdoor, crunchbase, news
-        )
-
-        logger.info(
-            f"Successfully generated summary for {name} with rating: {summary_result.rating}"
-        )
-        return CompanyResponse(
-            summary=summary_result.summary, rating=summary_result.rating
-        )
+        logger.info(f"Starting summarization for {name} with available data sources")
+        try:
+            # Add timeout for summarization
+            summary_result = await asyncio.wait_for(
+                summarize_company(name, linkedin, glassdoor, crunchbase, news),
+                timeout=SUMMARIZATION_TIMEOUT,
+            )
+            logger.info(
+                f"Successfully generated summary for {name} with rating: {summary_result.rating}"
+            )
+            return CompanyResponse(
+                summary=summary_result.summary, rating=summary_result.rating
+            )
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout during summarization for company: {name}")
+            raise HTTPException(
+                status_code=504,
+                detail="Request timeout while generating company summary",
+            )
 
     except Exception as e:
         logger.error(f"Error analyzing company {name}: {str(e)}", exc_info=True)

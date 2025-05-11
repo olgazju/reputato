@@ -70,7 +70,6 @@ async def summarize_company(
 ) -> CompanySummaryWithRating:
     logger.info(f"Starting summary generation for {company_name}")
 
-    # Format each data source, handling None values
     linkedin_text = format_data_for_prompt(
         linkedin.model_dump() if linkedin else None, "LinkedIn"
     )
@@ -84,7 +83,6 @@ async def summarize_company(
         news.model_dump() if news else None, "recent news"
     )
 
-    # Count available data sources
     available_sources = sum(
         1 for x in [linkedin, glassdoor, crunchbase, news] if x is not None
     )
