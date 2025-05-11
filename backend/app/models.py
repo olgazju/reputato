@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
-class SummaryOutput(BaseModel):
+class CompanySummaryWithRating(BaseModel):
     summary: str
+    rating: int  # 1 to 5
 
 class CompanyResponse(BaseModel):
     summary: str

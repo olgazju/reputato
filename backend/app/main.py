@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Query
 from app.models import CompanyResponse
-from app.rating import generate_rating
 from app.mcp_client import fetch_linkedin_data, fetch_glassdoor_data, fetch_crunchbase_data
 from app.summarizer import summarize_company
 import asyncio
@@ -21,17 +20,9 @@ async def analyze_company(name: str = Query(..., description="Company name")):
     print("glassdoor", glassdoor)
     print("crunchbase", crunchbase)
 
-    summary = await summarize_company(
-        company_name=name,
-        linkedin=linkedin,
-        glassdoor=glassdoor,
-        crunchbase=crunchbase
-    )
+    summary_result = await summarize_company(name, linkedin, glassdoor, crunchbase)
 
-    rating = generate_rating(
-        linkedin=linkedin,
-        glassdoor=glassdoor,
-        crunchbase=crunchbase
+    return CompanyResponse(
+        summary=summary_result.summary,
+        rating=summary_result.rating
     )
-
-    return CompanyResponse(summary=summary, rating=rating)

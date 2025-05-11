@@ -127,7 +127,7 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
         "Extract the following fields:\n"
         "- Overall company rating (float, out of 5)\n"
         "- Total number of employee reviews\n"
-        "- A short summary of the top 5 recent pros and cons from employee reviews\n\n"
+        "- A short summary of the top 5 pros and cons from employee reviews posted in 2025 or 2024 only\n\n"
         "Use the following tools in order:\n"
         "1. `scraping_browser_navigate` — to go to the Glassdoor company page\n"
         "2. `scraping_browser_get_text` — to extract visible content\n"
@@ -138,6 +138,7 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
         "  \"num_reviews\": int,\n"
         "  \"review_summary\": str\n"
         "}\n\n"
+        "Only use reviews from 2025 or 2024. Do not include older reviews.\n"
         "Do not include HTML, markdown, or explanations"
         "If a field is missing, use null for that field. If the company cannot be found at all, return null."
     )
