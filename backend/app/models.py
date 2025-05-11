@@ -31,3 +31,8 @@ class CrunchbaseProfile(BaseModel):
     funding_amount: Optional[str]
     investors: Optional[list[str]]
     key_people: Optional[list[str]]
+
+class NewsProfile(BaseModel):
+    layoffs: list[str]
+    scandals: list[str]
+    achievements: list[str]

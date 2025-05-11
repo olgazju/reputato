@@ -6,7 +6,7 @@ from pydantic_ai.settings import ModelSettings
 from pydantic_ai.mcp import MCPServerStdio
 from pydantic_ai.exceptions import ModelHTTPError
 from typing import Optional
-from app.models import LinkedInProfile, GlassdoorProfile, CrunchbaseProfile
+from app.models import LinkedInProfile, GlassdoorProfile, CrunchbaseProfile, NewsProfile
 
 load_dotenv()
 
@@ -41,6 +41,16 @@ crunchbase_server = MCPServerStdio(
     },
 )
 
+news_server = MCPServerStdio(
+    command="npx",
+    args=["@brightdata/mcp"],
+    env={
+        "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
+        "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_NEWS_UNLOCKER_ZONE"),
+        "BROWSER_AUTH": os.getenv("BROWSER_AUTH_NEWS", ""),
+    },
+)
+
 system_prompt = (
         "You are a tool-using agent connected to Bright Data's MCP server. "
         "You act as an OSINT investigator whose job is to evaluate companies based on public information. "
@@ -59,8 +69,10 @@ system_prompt = (
         "Do not invoke any other tools even if they are available."
     )
 
+model = "openai:gpt-4.1-mini"
+
 linkedin_agent = Agent(
-    "openai:gpt-4.1-mini",
+    model,
     output_type=LinkedInProfile,
     mcp_servers=[linkedin_server],
     retries=1,
@@ -106,11 +118,11 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
             result = await linkedin_agent.run(prompt)
             return result.output
     except ModelHTTPError as e:
-        print(f"Linkedin error] {e}")
+        print(f"Linkedin error {e}")
         return None
 
 glassdoor_agent = Agent(
-    "openai:gpt-4.1-mini",
+    model,
     output_type=GlassdoorProfile,
     mcp_servers=[glassdoor_server],
     retries=1,
@@ -147,11 +159,11 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
             result = await glassdoor_agent.run(prompt)
             return result.output
     except ModelHTTPError as e:
-        print(f"[Glassdoor error] {e}")
+        print(f"[Glassdoor error {e}")
         return None
     
 crunchbase_agent = Agent(
-    "openai:gpt-4.1-mini",
+    model,
     output_type=CrunchbaseProfile,
     mcp_servers=[crunchbase_server],
     retries=1,
@@ -192,5 +204,44 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
             result = await crunchbase_agent.run(prompt)
             return result.output
     except ModelHTTPError as e:
-        print(f"Crunchbase error] {e}")
+        print(f"Crunchbase error {e}")
+        return None
+    
+
+news_agent = Agent(
+    "openai:gpt-4o-mini",
+    output_type=NewsProfile,
+    mcp_servers=[news_server],
+    retries=2,
+    system_prompt=(
+        "You are a tool-using OSINT agent connected to Bright Data's MCP server. "
+        "Your job is to search for public news related to companies from 2023–2025. "
+        "You must identify any major events including layoffs, scandals, or achievements. "
+        "Only include verifiable news events. Do not hallucinate or assume. "
+        "Use search tools and extract only clearly dated, relevant headlines. "
+        "Return up to 3 short bullet summaries per category."
+    )
+)
+
+async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
+    prompt = (
+        f"Search for news about the company '{company_name}' from 2023, 2024, and 2025.\n\n"
+        "Extract the following if available:\n"
+        "- Layoffs: Dates and brief summaries of any layoff announcements.\n"
+        "- Scandals: Brief, neutral headlines about controversies or investigations.\n"
+        "- Achievements: Public product launches, funding milestones, acquisitions, or major hires.\n\n"
+        "Return a structured JSON object with keys:\n"
+        "{\n"
+        "  'layoffs': list[str],\n"
+        "  'scandals': list[str],\n"
+        "  'achievements': list[str]\n"
+        "}\n\n"
+        "If no news is found in a category, return an empty list. Do not include HTML, explanations, or irrelevant information."
+    )
+    try:
+        async with news_agent.run_mcp_servers():
+            result = await news_agent.run(prompt)
+            return result.output
+    except ModelHTTPError as e:
+        print(f"News error {e}")
         return None
