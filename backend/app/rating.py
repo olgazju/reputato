@@ -1,4 +1,4 @@
-from app.models import LinkedInProfile, GlassdoorProfile
+from app.models import LinkedInProfile, GlassdoorProfile, CrunchbaseProfile
 
-def generate_rating(linkedin: LinkedInProfile, glassdoor: GlassdoorProfile) -> int:
+def generate_rating(linkedin: LinkedInProfile, glassdoor: GlassdoorProfile, crunchbase: CrunchbaseProfile) -> int:
     return 4

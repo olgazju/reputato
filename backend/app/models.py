@@ -23,3 +23,10 @@ class GlassdoorProfile(BaseModel):
     num_reviews: Optional[int]
     review_summary: Optional[str]
     
+class CrunchbaseProfile(BaseModel):
+    founded: Optional[str]
+    funding_round: Optional[str]
+    funding_date: Optional[str]
+    funding_amount: Optional[str]
+    investors: Optional[list[str]]
+    key_people: Optional[list[str]]
