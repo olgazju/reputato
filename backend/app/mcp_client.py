@@ -6,49 +6,101 @@ from pydantic_ai.mcp import MCPServerStdio
 from pydantic_ai.exceptions import ModelHTTPError
 from typing import Optional
 from app.models import LinkedInProfile, GlassdoorProfile, CrunchbaseProfile, NewsProfile
+import logging
+from functools import wraps
+import time
 
+logger = logging.getLogger(__name__)
+
+# Load environment variables
 load_dotenv()
 
 
-glassdoor_server = MCPServerStdio(
-    command="npx",
-    args=["@brightdata/mcp"],
-    env={
-        "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
-        "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_GLASSDOOR_UNLOCKER_ZONE"),
-        "BROWSER_AUTH": os.getenv("BROWSER_AUTH_GLASSDOOR", ""),
-    },
-)
+def log_execution_time(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        start_time = time.time()
+        try:
+            result = await func(*args, **kwargs)
+            execution_time = time.time() - start_time
+            logger.info(f"{func.__name__} completed in {execution_time:.2f} seconds")
+            return result
+        except Exception as e:
+            execution_time = time.time() - start_time
+            logger.error(
+                f"{func.__name__} failed after {execution_time:.2f} seconds: {str(e)}",
+                exc_info=True,
+            )
+            raise
 
-linkedin_server = MCPServerStdio(
-    command="npx",
-    args=["@brightdata/mcp"],
-    env={
-        "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
-        "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE"),
-        "BROWSER_AUTH": os.getenv("BROWSER_AUTH_LINKEDIN", ""),
-    },
-)
+    return wrapper
 
-crunchbase_server = MCPServerStdio(
-    command="npx",
-    args=["@brightdata/mcp"],
-    env={
-        "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
-        "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE"),
-        "BROWSER_AUTH": os.getenv("BROWSER_AUTH_CRUNCHBASE", ""),
-    },
-)
 
-news_server = MCPServerStdio(
-    command="npx",
-    args=["@brightdata/mcp"],
-    env={
-        "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
-        "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_NEWS_UNLOCKER_ZONE"),
-        "BROWSER_AUTH": os.getenv("BROWSER_AUTH_NEWS", ""),
-    },
-)
+def validate_env_vars():
+    required_vars = [
+        "BRIGHTDATA_API_TOKEN",
+        "BRIGHTDATA_GLASSDOOR_UNLOCKER_ZONE",
+        "BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE",
+        "BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE",
+        "BRIGHTDATA_NEWS_UNLOCKER_ZONE",
+    ]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        logger.error(
+            f"Missing required environment variables: {', '.join(missing_vars)}"
+        )
+        raise EnvironmentError(
+            f"Missing required environment variables: {', '.join(missing_vars)}"
+        )
+
+
+validate_env_vars()
+
+# Initialize MCP servers
+try:
+    glassdoor_server = MCPServerStdio(
+        command="npx",
+        args=["@brightdata/mcp"],
+        env={
+            "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
+            "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_GLASSDOOR_UNLOCKER_ZONE"),
+            "BROWSER_AUTH": os.getenv("BROWSER_AUTH_GLASSDOOR", ""),
+        },
+    )
+
+    linkedin_server = MCPServerStdio(
+        command="npx",
+        args=["@brightdata/mcp"],
+        env={
+            "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
+            "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE"),
+            "BROWSER_AUTH": os.getenv("BROWSER_AUTH_LINKEDIN", ""),
+        },
+    )
+
+    crunchbase_server = MCPServerStdio(
+        command="npx",
+        args=["@brightdata/mcp"],
+        env={
+            "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
+            "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE"),
+            "BROWSER_AUTH": os.getenv("BROWSER_AUTH_CRUNCHBASE", ""),
+        },
+    )
+
+    news_server = MCPServerStdio(
+        command="npx",
+        args=["@brightdata/mcp"],
+        env={
+            "API_TOKEN": os.getenv("BRIGHTDATA_API_TOKEN"),
+            "WEB_UNLOCKER_ZONE": os.getenv("BRIGHTDATA_NEWS_UNLOCKER_ZONE"),
+            "BROWSER_AUTH": os.getenv("BROWSER_AUTH_NEWS", ""),
+        },
+    )
+    logger.info("Successfully initialized all MCP servers")
+except Exception:
+    logger.error("Failed to initialize MCP servers", exc_info=True)
+    raise
 
 system_prompt = (
     "You are a tool-using agent connected to Bright Data's MCP server. "
@@ -70,17 +122,59 @@ system_prompt = (
 
 model = "openai:gpt-4.1-mini"
 
-linkedin_agent = Agent(
-    model,
-    output_type=LinkedInProfile,
-    mcp_servers=[linkedin_server],
-    retries=1,
-    system_prompt=system_prompt,
-    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
-)
+# Initialize agents with proper error handling
+try:
+    linkedin_agent = Agent(
+        model,
+        output_type=LinkedInProfile,
+        mcp_servers=[linkedin_server],
+        retries=1,
+        system_prompt=system_prompt,
+        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+    )
+
+    glassdoor_agent = Agent(
+        model,
+        output_type=GlassdoorProfile,
+        mcp_servers=[glassdoor_server],
+        retries=1,
+        system_prompt=system_prompt,
+        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+    )
+
+    crunchbase_agent = Agent(
+        model,
+        output_type=CrunchbaseProfile,
+        mcp_servers=[crunchbase_server],
+        retries=1,
+        system_prompt=system_prompt,
+        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+    )
+
+    news_agent = Agent(
+        "openai:gpt-4o-mini",
+        output_type=NewsProfile,
+        mcp_servers=[news_server],
+        retries=2,
+        system_prompt=(
+            "You are a tool-using OSINT agent connected to Bright Data's MCP server. "
+            "Your job is to search for public news related to companies from 2023–2025. "
+            "You must identify any major events including layoffs, scandals, or achievements. "
+            "Only include verifiable news events. Do not hallucinate or assume. "
+            "Use search tools and extract only clearly dated, relevant headlines. "
+            "Return up to 3 short bullet summaries per category."
+        ),
+        model_settings=ModelSettings(request_timeout=300),  # timeout in seconds
+    )
+    logger.info("Successfully initialized all agents")
+except Exception:
+    logger.error("Failed to initialize agents", exc_info=True)
+    raise
 
 
+@log_execution_time
 async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
+    logger.info(f"Fetching LinkedIn data for company: {company_name}")
     prompt = (
         f"Your task is to find the LinkedIn profile for the company '{company_name}' and extract specific structured data.\n\n"
         "Use the `web_data_linkedin_company_profile` tool if available to extract the following fields:\n"
@@ -114,23 +208,22 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
     try:
         async with linkedin_agent.run_mcp_servers():
             result = await linkedin_agent.run(prompt)
+            logger.info(f"Successfully fetched LinkedIn data for {company_name}")
             return result.output
     except ModelHTTPError as e:
-        print(f"Linkedin error {e}")
+        logger.error(f"LinkedIn API error for {company_name}: {str(e)}", exc_info=True)
+        return None
+    except Exception as e:
+        logger.error(
+            f"Unexpected error fetching LinkedIn data for {company_name}: {str(e)}",
+            exc_info=True,
+        )
         return None
 
 
-glassdoor_agent = Agent(
-    model,
-    output_type=GlassdoorProfile,
-    mcp_servers=[glassdoor_server],
-    retries=1,
-    system_prompt=system_prompt,
-    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
-)
-
-
+@log_execution_time
 async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
+    logger.info(f"Fetching Glassdoor data for company: {company_name}")
     prompt = (
         f"Your task is to find the Glassdoor profile for the company '{company_name}' and extract specific structured data.\n\n"
         "Extract the following fields:\n"
@@ -154,23 +247,22 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
     try:
         async with glassdoor_agent.run_mcp_servers():
             result = await glassdoor_agent.run(prompt)
+            logger.info(f"Successfully fetched Glassdoor data for {company_name}")
             return result.output
     except ModelHTTPError as e:
-        print(f"[Glassdoor error {e}")
+        logger.error(f"Glassdoor API error for {company_name}: {str(e)}", exc_info=True)
+        return None
+    except Exception as e:
+        logger.error(
+            f"Unexpected error fetching Glassdoor data for {company_name}: {str(e)}",
+            exc_info=True,
+        )
         return None
 
 
-crunchbase_agent = Agent(
-    model,
-    output_type=CrunchbaseProfile,
-    mcp_servers=[crunchbase_server],
-    retries=1,
-    system_prompt=system_prompt,
-    model_settings=ModelSettings(request_timeout=120),  # timeout in seconds
-)
-
-
+@log_execution_time
 async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile]:
+    logger.info(f"Fetching Crunchbase data for company: {company_name}")
     prompt = (
         f"Search for the Crunchbase profile of the company '{company_name}'. "
         "Once you find the correct page, extract the following information:\n"
@@ -199,29 +291,24 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
     try:
         async with crunchbase_agent.run_mcp_servers():
             result = await crunchbase_agent.run(prompt)
+            logger.info(f"Successfully fetched Crunchbase data for {company_name}")
             return result.output
     except ModelHTTPError as e:
-        print(f"Crunchbase error {e}")
+        logger.error(
+            f"Crunchbase API error for {company_name}: {str(e)}", exc_info=True
+        )
+        return None
+    except Exception as e:
+        logger.error(
+            f"Unexpected error fetching Crunchbase data for {company_name}: {str(e)}",
+            exc_info=True,
+        )
         return None
 
 
-news_agent = Agent(
-    "openai:gpt-4o-mini",
-    output_type=NewsProfile,
-    mcp_servers=[news_server],
-    retries=2,
-    system_prompt=(
-        "You are a tool-using OSINT agent connected to Bright Data's MCP server. "
-        "Your job is to search for public news related to companies from 2023–2025. "
-        "You must identify any major events including layoffs, scandals, or achievements. "
-        "Only include verifiable news events. Do not hallucinate or assume. "
-        "Use search tools and extract only clearly dated, relevant headlines. "
-        "Return up to 3 short bullet summaries per category."
-    ),
-)
-
-
+@log_execution_time
 async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
+    logger.info(f"Fetching news data for company: {company_name}")
     prompt = (
         f"Search for news about the company '{company_name}' from 2023, 2024, and 2025.\n\n"
         "Extract the following if available:\n"
@@ -239,7 +326,14 @@ async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
     try:
         async with news_agent.run_mcp_servers():
             result = await news_agent.run(prompt)
+            logger.info(f"Successfully fetched news data for {company_name}")
             return result.output
     except ModelHTTPError as e:
-        print(f"News error {e}")
+        logger.error(f"News API error for {company_name}: {str(e)}", exc_info=True)
+        return None
+    except Exception as e:
+        logger.error(
+            f"Unexpected error fetching news data for {company_name}: {str(e)}",
+            exc_info=True,
+        )
         return None
