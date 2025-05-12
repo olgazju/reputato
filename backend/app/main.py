@@ -31,38 +31,33 @@ async def analyze_company(name: str = Query(..., description="Company name")):
     logger.info(f"Starting company analysis for: {name}")
     try:
 
-        linkedin_task = asyncio.create_task(fetch_linkedin_data(name))
-        glassdoor_task = asyncio.create_task(fetch_glassdoor_data(name))
-        crunchbase_task = asyncio.create_task(fetch_crunchbase_data(name))
-        news_task = asyncio.create_task(fetch_news_data(name))
+        tasks = {
+            "linkedin": asyncio.create_task(fetch_linkedin_data(name)),
+            "glassdoor": asyncio.create_task(fetch_glassdoor_data(name)),
+            "crunchbase": asyncio.create_task(fetch_crunchbase_data(name)),
+            "news": asyncio.create_task(fetch_news_data(name)),
+        }
 
-        try:
-            linkedin, glassdoor, crunchbase, news = await asyncio.wait_for(
-                asyncio.gather(
-                    linkedin_task,
-                    glassdoor_task,
-                    crunchbase_task,
-                    news_task,
-                    return_exceptions=True,
-                ),
-                timeout=DATA_FETCH_TIMEOUT,
-            )
-            logger.info("All data fetching tasks completed")
-        except asyncio.TimeoutError:
-            logger.error(f"Timeout while fetching data for company: {name}")
-            # If timeout occurs, cancel all tasks
-            for task in [linkedin_task, glassdoor_task, crunchbase_task, news_task]:
-                if not task.done():
-                    task.cancel()
-            raise HTTPException(
-                status_code=504, detail="Request timeout while fetching company data"
-            )
+        done, pending = await asyncio.wait(tasks.values(), timeout=DATA_FETCH_TIMEOUT)
 
-        # Handle exceptions from individual tasks
-        linkedin = linkedin if not isinstance(linkedin, Exception) else None
-        glassdoor = glassdoor if not isinstance(glassdoor, Exception) else None
-        crunchbase = crunchbase if not isinstance(crunchbase, Exception) else None
-        news = news if not isinstance(news, Exception) else None
+        results = {}
+        for key, task in tasks.items():
+            if task in done:
+                try:
+                    results[key] = await task
+                    logger.info(f"{key} task completed")
+                except Exception as e:
+                    results[key] = None
+                    logger.warning(f"{key} failed: {e}")
+            else:
+                task.cancel()
+                results[key] = None
+                logger.warning(f"{key} task timed out and was cancelled")
+
+        linkedin = results["linkedin"]
+        glassdoor = results["glassdoor"]
+        crunchbase = results["crunchbase"]
+        news = results["news"]
 
         logger.info(
             f"Data fetch results for {name}: LinkedIn: {'Success' if linkedin else 'Failed'}, "
