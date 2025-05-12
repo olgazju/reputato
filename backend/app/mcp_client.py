@@ -161,7 +161,7 @@ try:
     )
 
     news_agent = Agent(
-        "openai:gpt-4o-mini",
+        model,
         output_type=NewsProfile,
         mcp_servers=[news_server],
         retries=2,
@@ -222,6 +222,7 @@ async def fetch_linkedin_data(company_name: str) -> Optional[LinkedInProfile]:
                 linkedin_agent.run(prompt), timeout=REQUEST_TIMEOUT
             )
             logger.info(f"Successfully fetched LinkedIn data for {company_name}")
+            logger.info(result.output)
             return result.output
     except ModelHTTPError as e:
         logger.error(f"LinkedIn API error for {company_name}: {str(e)}", exc_info=True)
@@ -263,6 +264,7 @@ async def fetch_glassdoor_data(company_name: str) -> Optional[GlassdoorProfile]:
                 glassdoor_agent.run(prompt), timeout=REQUEST_TIMEOUT
             )
             logger.info(f"Successfully fetched Glassdoor data for {company_name}")
+            logger.info(result.output)
             return result.output
     except ModelHTTPError as e:
         logger.error(f"Glassdoor API error for {company_name}: {str(e)}", exc_info=True)
@@ -309,6 +311,7 @@ async def fetch_crunchbase_data(company_name: str) -> Optional[CrunchbaseProfile
                 crunchbase_agent.run(prompt), timeout=REQUEST_TIMEOUT
             )
             logger.info(f"Successfully fetched Crunchbase data for {company_name}")
+            logger.info(result.output)
             return result.output
     except ModelHTTPError as e:
         logger.error(
@@ -346,6 +349,7 @@ async def fetch_news_data(company_name: str) -> Optional[NewsProfile]:
                 news_agent.run(prompt), timeout=REQUEST_TIMEOUT
             )
             logger.info(f"Successfully fetched news data for {company_name}")
+            logger.info(result.output)
             return result.output
     except ModelHTTPError as e:
         logger.error(f"News API error for {company_name}: {str(e)}", exc_info=True)
