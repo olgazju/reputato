@@ -5,6 +5,13 @@ services:
       - "8000:8000"
     environment:
       - NODE_ENV=production
+      - PYTHONUNBUFFERED=1
     volumes:
       - .:/app
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 24G
+        reservations:
+          memory: 24G
