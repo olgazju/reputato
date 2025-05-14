@@ -17,6 +17,8 @@ Reputato is an OSINT (Open Source Intelligence) agent designed to help job seeke
 
 The backend is built as a FastAPI service that leverages PydanticAI for intelligent agent orchestration. PydanticAI provides a robust framework for building production-grade AI applications with structured data validation and type safety. The system uses OpenAI's models for natural language processing and data analysis. You can configure the model in the environment variables, but by default, it uses GPT-4 for optimal performance.
 
+> **Note**: While Docker and Docker Compose configurations are available, there is a known issue with browser tools in Docker containers. For more details, please refer to [Issue #1](https://github.com/yourusername/reputato/issues/1).
+
 ## Prerequisites
 
 - Python 3.12+ (managed via pyenv)
@@ -82,9 +84,21 @@ The backend is built as a FastAPI service that leverages PydanticAI for intellig
    BROWSER_AUTH_GLASSDOOR=your_glassdoor_auth
    BROWSER_AUTH_CRUNCHBASE=your_crunchbase_auth
    BROWSER_AUTH_NEWS=your_news_auth
+   LOGFIRE_TOKEN=your_logfire_token  # Optional: Add this to enable logging through Logfire
    ```
 
 ## Running the Application
+
+You can run the application either using Docker or locally:
+
+### Using Docker
+
+1. **Build and run with Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+### Local Development
 
 1. **Start the backend server**:
    ```bash
@@ -111,6 +125,8 @@ reputato/
 ├── frontend/
 │   ├── app.py
 │   └── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
 ├── .env
 └── README.md
 ```

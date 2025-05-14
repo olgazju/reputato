@@ -1,6 +1,5 @@
 import os
 import asyncio
-from dotenv import load_dotenv
 from pydantic_ai import Agent
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai.mcp import MCPServerStdio
@@ -12,9 +11,6 @@ from functools import wraps
 import time
 
 logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
 
 REQUEST_TIMEOUT = 240
 
