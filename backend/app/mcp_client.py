@@ -129,9 +129,7 @@ try:
         mcp_servers=[linkedin_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(
-            request_timeout=REQUEST_TIMEOUT
-        ),  # timeout in seconds
+        model_settings=ModelSettings(request_timeout=REQUEST_TIMEOUT, max_tokens=2048),
     )
 
     glassdoor_agent = Agent(
@@ -140,9 +138,7 @@ try:
         mcp_servers=[glassdoor_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(
-            request_timeout=REQUEST_TIMEOUT
-        ),  # timeout in seconds
+        model_settings=ModelSettings(request_timeout=REQUEST_TIMEOUT, max_tokens=2048),
     )
 
     crunchbase_agent = Agent(
@@ -151,9 +147,7 @@ try:
         mcp_servers=[crunchbase_server],
         retries=1,
         system_prompt=system_prompt,
-        model_settings=ModelSettings(
-            request_timeout=REQUEST_TIMEOUT
-        ),  # timeout in seconds
+        model_settings=ModelSettings(request_timeout=REQUEST_TIMEOUT, max_tokens=2048),
     )
 
     news_agent = Agent(
@@ -169,9 +163,7 @@ try:
             "Use search tools and extract only clearly dated, relevant headlines. "
             "Return up to 3 short bullet summaries per category."
         ),
-        model_settings=ModelSettings(
-            request_timeout=REQUEST_TIMEOUT
-        ),  # timeout in seconds
+        model_settings=ModelSettings(request_timeout=REQUEST_TIMEOUT, max_tokens=2048),
     )
     logger.info("Successfully initialized all agents")
 except Exception:

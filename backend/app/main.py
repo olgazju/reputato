@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 from fastapi import FastAPI, Query, HTTPException
 from app.models import CompanyResponse
 from app.mcp_client import (
@@ -10,7 +15,7 @@ from app.summarizer import summarize_company
 import asyncio
 import logging
 import os
-from dotenv import load_dotenv
+
 import logfire
 
 log_level = os.getenv("LOG_LEVEL", "INFO")
@@ -20,9 +25,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
 
 logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 logfire.instrument_mcp()
