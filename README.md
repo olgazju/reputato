@@ -1,6 +1,6 @@
 # Reputato
 
-Not every job is golden. We sniff out the ones that are.
+Not every company is golden. We sniff out the ones that are.
 
 ## What is Reputato?
 

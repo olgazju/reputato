@@ -157,7 +157,7 @@ try:
         retries=2,
         system_prompt=(
             "You are a tool-using OSINT agent connected to Bright Data's MCP server. "
-            "Your job is to search for public news related to companies from 2023–2025. "
+            "Your job is to search for public news related to companies from 2023-2025. "
             "You must identify any major events including layoffs, scandals, or achievements. "
             "Only include verifiable news events. Do not hallucinate or assume. "
             "Use search tools and extract only clearly dated, relevant headlines. "
