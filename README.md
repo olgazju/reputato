@@ -6,7 +6,7 @@ Not every company is golden. We sniff out the ones that are.
 
 Reputato is an OSINT (Open Source Intelligence) agent designed to help job seekers and professionals make informed decisions about potential employers. By aggregating and analyzing data from multiple sources including LinkedIn, Glassdoor, Crunchbase, and news articles, Reputato provides comprehensive insights into companies' reputation, work culture, financial health, and recent developments.
 
-
+Original post on [dev.to](https://dev.to/olgabraginskaya/reputato-not-every-company-is-golden-we-sniff-out-the-ones-that-are-3daa)
 
 https://github.com/user-attachments/assets/273d23ec-ad58-4c24-b33a-be4ff3699571
 
@@ -31,7 +31,7 @@ Screenshots of summaries:
 
 The backend is built as a FastAPI service that leverages PydanticAI for intelligent agent orchestration. PydanticAI provides a robust framework for building production-grade AI applications with structured data validation and type safety. The system uses OpenAI's models for natural language processing and data analysis. You can configure the model in the environment variables, but by default, it uses GPT-4 for optimal performance.
 
-> **Note**: While Docker and Docker Compose configurations are available, there is a known issue with browser tools in Docker containers. For more details, please refer to [Issue #1](https://github.com/yourusername/reputato/issues/1).
+> **Note**: While Docker and Docker Compose configurations are available, there is a known issue with browser tools in Docker containers. For more details, please refer to [Issue](https://github.com/yourusername/reputato/issues/1).
 
 ## Prerequisites
 
