@@ -11,6 +11,14 @@ Reputato is an OSINT (Open Source Intelligence) agent designed to help job seeke
 https://github.com/user-attachments/assets/273d23ec-ad58-4c24-b33a-be4ff3699571
 
 
+Screenshots of summaries:
+
+Open.AI:
+<img width="728" alt="image" src="https://github.com/user-attachments/assets/fdf4351b-1013-43cb-bb7f-c02bc4479fa2" />
+
+Intel:
+<img width="764" alt="image" src="https://github.com/user-attachments/assets/5f7a9112-7f7a-40e2-9fd4-fbf6a0ca2382" />
+
 
 ## Features
 
