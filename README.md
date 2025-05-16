@@ -6,6 +6,12 @@ Not every company is golden. We sniff out the ones that are.
 
 Reputato is an OSINT (Open Source Intelligence) agent designed to help job seekers and professionals make informed decisions about potential employers. By aggregating and analyzing data from multiple sources including LinkedIn, Glassdoor, Crunchbase, and news articles, Reputato provides comprehensive insights into companies' reputation, work culture, financial health, and recent developments.
 
+
+
+https://github.com/user-attachments/assets/273d23ec-ad58-4c24-b33a-be4ff3699571
+
+
+
 ## Features
 
 - **Multi-Source Data Collection**: Gathers information from LinkedIn, Glassdoor, Crunchbase, and news sources
