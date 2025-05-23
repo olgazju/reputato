@@ -39,6 +39,47 @@ The backend is built as a FastAPI service that leverages PydanticAI for intellig
 - Bright Data account with API access
 - OpenAI API key
 
+## Configuration
+
+### Backend Configuration (.env)
+
+Create a `.env` file in the backend directory with the following variables:
+
+```env
+# API Keys
+BRIGHTDATA_API_TOKEN=your_brightdata_token
+OPENAI_API_KEY=your_openai_key
+REPUTATO_API_KEY=your_own_generated_api_key
+
+# URLs
+FRONTEND_URL=http://localhost:8501
+
+# Bright Data Zones
+BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE=your_linkedin_zone
+BRIGHTDATA_GLASSDOOR_UNLOCKER_ZONE=your_glassdoor_zone
+BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE=your_crunchbase_zone
+BRIGHTDATA_NEWS_UNLOCKER_ZONE=your_news_zone
+
+# Browser Authentication
+BROWSER_AUTH_LINKEDIN=your_linkedin_auth
+BROWSER_AUTH_GLASSDOOR=your_glassdoor_auth
+BROWSER_AUTH_CRUNCHBASE=your_crunchbase_auth
+BROWSER_AUTH_NEWS=your_news_auth
+
+# Optional: Logging Configuration
+LOGFIRE_TOKEN=your_logfire_token  # Add this to enable logging through Logfire
+```
+
+### Frontend Configuration (Streamlit)
+
+Create a `.streamlit/secrets.toml` file in the frontend directory with the following configuration:
+
+```toml
+[backend]
+url = "http://localhost:8000"
+apikey = "your_own_generated_api_key"
+```
+
 ## Local Development Setup
 
 1. **Install pyenv** (if not already installed):
@@ -85,22 +126,6 @@ The backend is built as a FastAPI service that leverages PydanticAI for intellig
    pip install -r requirements.txt
    ```
 
-6. **Configure environment variables**:
-   Create a `.env` file in the project root with the following variables:
-   ```
-   BRIGHTDATA_API_TOKEN=your_brightdata_token
-   OPENAI_API_KEY=your_openai_key
-   BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE=your_linkedin_zone
-   BRIGHTDATA_GLASSDOOR_UNLOCKER_ZONE=your_glassdoor_zone
-   BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE=your_crunchbase_zone
-   BRIGHTDATA_NEWS_UNLOCKER_ZONE=your_news_zone
-   BROWSER_AUTH_LINKEDIN=your_linkedin_auth
-   BROWSER_AUTH_GLASSDOOR=your_glassdoor_auth
-   BROWSER_AUTH_CRUNCHBASE=your_crunchbase_auth
-   BROWSER_AUTH_NEWS=your_news_auth
-   LOGFIRE_TOKEN=your_logfire_token  # Optional: Add this to enable logging through Logfire
-   ```
-
 ## Running the Application
 
 You can run the application either using Docker or locally:
@@ -136,12 +161,13 @@ reputato/
 │   ├── app/
 │   ├── requirements.txt
 │   └── run.py
+│   └── .env
 ├── frontend/
 │   ├── app.py
 │   └── requirements.txt
+│   └── .streamlit/secrets.toml
 ├── Dockerfile
 ├── docker-compose.yml
-├── .env
 └── README.md
 ```
 
