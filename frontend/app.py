@@ -23,8 +23,10 @@ result_container = st.empty()
 if submit and company_name.strip():
     with st.spinner("Analyzing... getting potatoes ready"):
         try:
+            headers = {"x-api-key": st.secrets["backend"]["apikey"]}
+            params = {"name": company_name}
             response = requests.get(
-                f"{BACKEND_URL}/analyze_company", params={"name": company_name}
+                "{BACKEND_URL}/analyze_company", params=params, headers=headers
             )
 
             if response.status_code == 200:

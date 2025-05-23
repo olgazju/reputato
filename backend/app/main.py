@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 
 from dotenv import load_dotenv
@@ -186,10 +186,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+API_KEY = os.getenv("REPUTATO_API_KEY")
+
 
 @app.get("/analyze_company", response_model=CompanyResponse)
-async def analyze_company(name: str = Query(..., description="Company name")):
+async def analyze_company(
+    name: str = Query(..., description="Company name"), x_api_key: str = Header(...)
+):
     logger.info(f"Analyzing company: {name}")
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden")
     try:
         linkedin_prompt = (
             f"Your task is to find the LinkedIn profile for the company '{name}' and extract specific structured data.\n\n"
