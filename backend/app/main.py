@@ -42,6 +42,7 @@ REQUIRED_VARS = [
     "BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE",
     "BRIGHTDATA_NEWS_UNLOCKER_ZONE",
     "OPENAI_API_KEY",
+    "REPUTATO_API_KEY",
 ]
 missing_vars = [v for v in REQUIRED_VARS if not os.getenv(v)]
 if missing_vars:
