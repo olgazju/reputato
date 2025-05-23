@@ -1,8 +1,5 @@
 import streamlit as st
 import requests
-from dotenv import load_dotenv
-
-load_dotenv()
 
 BACKEND_URL = st.secrets["backend"]["url"]
 
