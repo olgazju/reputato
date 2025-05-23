@@ -13,10 +13,12 @@ import json
 from typing import Optional
 import logging
 
+from dotenv import load_dotenv
 
+load_dotenv()
 logger = logging.getLogger(__name__)
 
-SUMMARIZATION_TIMEOUT = 300  # 5 minutes for summarization
+REQUEST_TIMEOUT = 120  # 2 minutes for summarization
 
 summarizer_agent = Agent(
     model="openai:gpt-4o",
@@ -32,7 +34,7 @@ summarizer_agent = Agent(
         "After the summary, assign a Reputato Score (1 to 5), where 5 is excellent and 1 means 'run away'."
         "If some data sources are missing, focus on what you know and be clear about what information is unavailable."
     ),
-    model_settings=ModelSettings(request_timeout=SUMMARIZATION_TIMEOUT),
+    model_settings=ModelSettings(request_timeout=REQUEST_TIMEOUT),
 )
 
 
