@@ -23,7 +23,7 @@ if submit and company_name.strip():
             headers = {"x-api-key": st.secrets["backend"]["apikey"]}
             params = {"name": company_name}
             response = requests.get(
-                "{BACKEND_URL}/analyze_company", params=params, headers=headers
+                f"{BACKEND_URL}/analyze_company", params=params, headers=headers
             )
 
             if response.status_code == 200:
