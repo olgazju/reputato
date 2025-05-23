@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 .python-version
 .DS_Store
+frontend/.streamlit/secrets.toml

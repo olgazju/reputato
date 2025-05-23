@@ -1,11 +1,10 @@
 import streamlit as st
 import requests
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = st.secrets["backend"]["url"]
 
 st.set_page_config(page_title="Reputato", page_icon="🥔")
 st.title("🥔 Reputato")
