@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 import asyncio
@@ -176,6 +178,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://reputato-jdrzv9otwhstyktkmwqpyd.streamlit.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/analyze_company", response_model=CompanyResponse)
