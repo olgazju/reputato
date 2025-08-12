@@ -29,7 +29,7 @@ Screenshots of summaries:
 
 ## Technology Stack
 
-The backend is built as a FastAPI service that leverages PydanticAI for intelligent agent orchestration. PydanticAI provides a robust framework for building production-grade AI applications with structured data validation and type safety. The system uses OpenAI's models for natural language processing and data analysis. You can configure the model in the environment variables, but by default, it uses GPT-4 for optimal performance.
+The backend is built as a FastAPI service that leverages PydanticAI for intelligent agent orchestration. PydanticAI provides a robust framework for building production-grade AI applications with structured data validation and type safety. The system uses Anthropic's models for natural language processing and data analysis. You can configure the model in the environment variables, but by default, it uses GPT-4 for optimal performance.
 
 > **Note**: While Docker and Docker Compose configurations are available, there was a known issue with browser tools in Docker containers. This has been resolved by implementing the solution from [Bright Data MCP issue #11](https://github.com/luminati-io/brightdata-mcp/issues/11#issuecomment-2889967823): launching the MCP server once at app start-up and keeping it alive across requests, while closing (or timing-out) the browser only after the final multi-step tool call.
 
@@ -37,7 +37,7 @@ The backend is built as a FastAPI service that leverages PydanticAI for intellig
 
 - Python 3.12+ (managed via pyenv)
 - Bright Data account with API access
-- OpenAI API key
+- Anthropic API key
 
 ## Configuration
 
@@ -48,7 +48,7 @@ Create a `.env` file in the backend directory with the following variables:
 ```env
 # API Keys
 BRIGHTDATA_API_TOKEN=your_brightdata_token
-OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key
 REPUTATO_API_KEY=your_own_generated_api_key
 
 # URLs

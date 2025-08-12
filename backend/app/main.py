@@ -41,14 +41,14 @@ REQUIRED_VARS = [
     "BRIGHTDATA_LINKEDIN_UNLOCKER_ZONE",
     "BRIGHTDATA_CRUNCHBASE_UNLOCKER_ZONE",
     "BRIGHTDATA_NEWS_UNLOCKER_ZONE",
-    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
     "REPUTATO_API_KEY",
 ]
 missing_vars = [v for v in REQUIRED_VARS if not os.getenv(v)]
 if missing_vars:
     raise EnvironmentError(f"Missing env vars: {', '.join(missing_vars)}")
 
-model = "openai:gpt-4.1-mini"
+model = "anthropic:claude-3-5-haiku-latest"
 
 REQUEST_TIMEOUT = 300
 DATA_FETCH_TIMEOUT = 300

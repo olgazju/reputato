@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 REQUEST_TIMEOUT = 120  # 2 minutes for summarization
 
 summarizer_agent = Agent(
-    model="openai:gpt-4o",
+    model="anthropic:claude-3-5-sonnet-latest",
     output_type=CompanySummaryWithRating,
     system_prompt=(
         "You are an OSINT analyst who writes honest and useful summaries of companies for job seekers. "
@@ -126,6 +126,7 @@ async def summarize_company(
         logger.info(
             f"Successfully generated summary for {company_name} with rating {result.output.rating}"
         )
+        logger.info(result.output.summary)
         return result.output
     except Exception as e:
         logger.error(
